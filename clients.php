@@ -130,12 +130,51 @@ float:right;
     </div>
   </div>
   <!-------------------------- modal ends ---------------------------->
+  
+  <!-- Modal Lectura Medidor -->
+  <div class="modal fade" id="lecturaModal" role="dialog">
+    <div class="modal-dialog" style="width:400px;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Lectura de Medidor</h4>
+        </div>
+        <div class="modal-body">
+          <p><?php include "lectura_medidor.php"; ?></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal Facturación Mensual -->
+  <div class="modal fade" id="facturacionModal" role="dialog">
+    <div class="modal-dialog" style="width:800px;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Facturación Mensual</h4>
+        </div>
+        <div class="modal-body">
+          <p><?php include "ver_facturacion.php"; ?></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-------------------------- modals end ---------------------------->
       
       
          <div class="panel panel-info">
             <div class="panel-heading">
                 <div class="panel-title"><h5>System Clients</h5>
                 <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#myModal"> + Add client</button>
+                <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#lecturaModal"> + Lectura Medidor</button>
+                <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target="#facturacionModal"> Ver Facturación</button>
                 <a href="deleteclient.php"><button class="btn btn-danger btn-xs">Delete all</button></a>
                 </div>
             </div>
