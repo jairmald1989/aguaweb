@@ -12,6 +12,8 @@
    Address:
     <input type="text" name="address" class="form-control" required="required"/>
     Contact #:<input type="text" name="contact"  class="form-control" required="required"/>
+    Cédula/RUC:
+    <input type="text" name="cedula_ruc" class="form-control" required="required"/>
     First Meter Reading:
     <input type="text" name="meterReader" class="form-control" required="required"/>
     <br />

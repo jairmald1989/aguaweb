@@ -10,10 +10,11 @@ include 'db.php';
 					$mi=$_POST['mi'] ;
 					$address=$_POST['address'] ;
 					$contact=$_POST['contact'] ;
+					$cedula_ruc=$_POST['cedula_ruc'] ;
 					$meterReader = $_POST['meterReader'];
 					
-		 mysqli_query($conn,"INSERT INTO  owners (lname,fname,mi,address,contact) 
-		 VALUES ('$lname','$fname','$mi','$address','$contact')"); 
+		 mysqli_query($conn,"INSERT INTO  owners (lname,fname,mi,address,contact,cedula_ruc) 
+		 VALUES ('$lname','$fname','$mi','$address','$contact','$cedula_ruc')"); 
 		 mysqli_query($conn,"INSERT INTO  tempo_bill (Client,Prev)
 		 VALUES ('$fname','$meterReader')");
 				
