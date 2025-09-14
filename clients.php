@@ -153,6 +153,7 @@ echo "<table class=\"table\" bgcolor='#fff'>
 <th>Mi</th>
 <th>Address</th>
 <th>Contact</th>
+<th>Cédula/RUC</th>
 <th>Action</th>
 </tr>";
 
@@ -165,6 +166,7 @@ while($row = mysqli_fetch_array($result))
   echo "<td>" . $row['mi'] . "</td>";
   echo "<td>" . $row['address'] . "</td>";
   echo "<td>" . $row['contact'] . "</td>";
+  echo "<td>" . $row['cedula_ruc'] . "</td>";
  echo "<td><a rel='facebox' href='edit.php?id=".$row['id']."'><button class=\"btn btn-default btn-xs\"><span class=\"glyphicon glyphicon-edit\"></span></button> </a>| ";
  echo "<a rel='facebox' href='del.php?id=".$row['id']."'><button class=\"btn btn-danger btn-xs\"><span class=\"glyphicon glyphicon-trash \"></span></button></td>";
   echo "</tr>";

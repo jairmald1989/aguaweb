@@ -15,6 +15,7 @@ if (!$result)
 				$mi=$test['mi'] ;
 				$address=$test['address'] ;
 				$contact=$test['contact'] ;
+				$cedula_ruc=$test['cedula_ruc'] ;
 
 ?>
 
@@ -47,6 +48,9 @@ if (!$result)
   <tr>
   <td>Contact:</td>
     <td><input type="text" name="contact" value="<?php echo $contact; ?>"/></td></tr>
+  <tr>
+  <td>Cédula/RUC:</td>
+    <td><input type="text" name="cedula_ruc" value="<?php echo $cedula_ruc; ?>"/></td></tr>
  <tr>
 		<td>&nbsp;</td>
 		<td><input type="submit" name="save" value="Edit"  /></td>

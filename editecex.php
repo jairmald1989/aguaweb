@@ -7,9 +7,10 @@ $owner_id =$_REQUEST['id'];
 	$mi = $_POST['mi'];
 	$address=$_POST['address'] ;
 	$contact=$_POST['contact'] ;
+	$cedula_ruc=$_POST['cedula_ruc'] ;
 
 	mysqli_query($conn,"UPDATE owners SET id ='$id', lname ='$lname',
-		 fname ='$fname',mi ='$mi', address='$address', contact='$contact' WHERE id = '$owner_id'");
+		 fname ='$fname',mi ='$mi', address='$address', contact='$contact', cedula_ruc='$cedula_ruc' WHERE id = '$owner_id'");
 			
 
 		 echo "<script>windows: location='billing.php'</script>";				
