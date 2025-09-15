@@ -130,15 +130,64 @@ float:right;
     </div>
   </div>
   <!-------------------------- modal ends ---------------------------->
+  
+  <!-- Import Modal -->
+  <div class="modal fade" id="importModal" role="dialog">
+    <div class="modal-dialog" style="width:500px;">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Importar Clientes desde CSV</h4>
+        </div>
+        <div class="modal-body">
+          <div id="import-messages"></div>
+          <form id="importForm" enctype="multipart/form-data">
+            <div class="form-group">
+              <label for="csv_file">Seleccionar archivo CSV:</label>
+              <input type="file" name="csv_file" id="csv_file" class="form-control" accept=".csv" required />
+              <small class="help-block">El archivo debe tener las columnas: lname, fname, mi, address, contact</small>
+            </div>
+            <div class="form-group">
+              <a href="plantillas/plantilla_clientes.csv" download class="btn btn-info btn-sm">
+                <span class="glyphicon glyphicon-download"></span> Descargar plantilla de ejemplo
+              </a>
+            </div>
+            <button type="submit" class="btn btn-success">
+              <span class="glyphicon glyphicon-upload"></span> Importar clientes
+            </button>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-------------------------- import modal ends ---------------------------->
       
       
          <div class="panel panel-info">
             <div class="panel-heading">
                 <div class="panel-title"><h5>System Clients</h5>
                 <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#myModal"> + Add client</button>
+                <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target="#importModal">Importar desde Excel</button>
                 <a href="deleteclient.php"><button class="btn btn-danger btn-xs">Delete all</button></a>
                 </div>
             </div>
+            <?php
+            // Display import messages if available
+            if (isset($_SESSION['import_message'])) {
+                $message = $_SESSION['import_message'];
+                $type = $_SESSION['import_type'];
+                echo '<div class="alert alert-' . $type . ' alert-dismissible">';
+                echo '<button type="button" class="close" data-dismiss="alert">&times;</button>';
+                echo $message;
+                echo '</div>';
+                unset($_SESSION['import_message']);
+                unset($_SESSION['import_type']);
+            }
+            ?>
               <div class="panel-body">
             
  <?php
@@ -220,5 +269,61 @@ return false;
 
 });
 
+});
+</script>
+
+<script>
+// Handle CSV import form
+$(document).ready(function() {
+    $('#importForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        var formData = new FormData();
+        var fileInput = $('#csv_file')[0];
+        
+        if (fileInput.files.length === 0) {
+            showImportMessage('Por favor seleccione un archivo CSV.', 'danger');
+            return;
+        }
+        
+        formData.append('csv_file', fileInput.files[0]);
+        formData.append('import_csv', '1');
+        
+        // Show loading message
+        showImportMessage('Procesando archivo, por favor espere...', 'info');
+        
+        $.ajax({
+            url: 'importar_clientes.php',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    showImportMessage(response.message, 'success');
+                    // Reset form
+                    $('#importForm')[0].reset();
+                    // Reload page after 2 seconds to show new clients
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    showImportMessage(response.message, 'danger');
+                }
+            },
+            error: function() {
+                showImportMessage('Error al procesar el archivo. Intente nuevamente.', 'danger');
+            }
+        });
+    });
+    
+    function showImportMessage(message, type) {
+        var alertClass = 'alert-' + type;
+        var html = '<div class="alert ' + alertClass + ' alert-dismissible">' +
+                   '<button type="button" class="close" data-dismiss="alert">&times;</button>' +
+                   message + '</div>';
+        $('#import-messages').html(html);
+    }
 });
 </script>
