@@ -42,16 +42,30 @@ if (isset($_POST['import_csv']) && isset($_FILES['csv_file'])) {
     $skipped = 0;
     
     while (($data = fgetcsv($handle)) !== FALSE) {
-        // Skip empty rows
-        if (count($data) < 5 || empty(trim($data[0])) || empty(trim($data[1]))) {
+        // Skip empty rows or rows with insufficient data
+        if (count($data) < 5) {
             continue;
         }
         
-        $lname = mysqli_real_escape_string($conn, trim($data[0]));
-        $fname = mysqli_real_escape_string($conn, trim($data[1]));
-        $mi = mysqli_real_escape_string($conn, trim($data[2]));
-        $address = mysqli_real_escape_string($conn, trim($data[3]));
-        $contact = mysqli_real_escape_string($conn, trim($data[4]));
+        // Clean and validate data
+        $lname = trim($data[0]);
+        $fname = trim($data[1]);
+        $mi = trim($data[2]);
+        $address = trim($data[3]);
+        $contact = trim($data[4]);
+        
+        // Skip if essential fields are empty
+        if (empty($lname) || empty($fname) || empty($mi)) {
+            $skipped++;
+            continue;
+        }
+        
+        // Escape data for database
+        $lname = mysqli_real_escape_string($conn, $lname);
+        $fname = mysqli_real_escape_string($conn, $fname);
+        $mi = mysqli_real_escape_string($conn, $mi);
+        $address = mysqli_real_escape_string($conn, $address);
+        $contact = mysqli_real_escape_string($conn, $contact);
         
         // Check for duplicates by mi (cedula) or contact (email/phone)
         $check_query = "SELECT id FROM owners WHERE mi = '$mi' OR contact = '$contact'";
