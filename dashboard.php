@@ -1,61 +1,41 @@
 <?php
 require_once 'app/config/config.php';
-require_once 'app/config/database.php';
-require_once 'app/models/Auth.php';
 
-$auth = new Auth();
-$auth->requireAuth();
+// Demo authentication check
+if (!isset($_SESSION['user_id'])) {
+    header('Location: index.php');
+    exit;
+}
 
-$db = Database::getInstance();
 $page_title = "Dashboard";
 
-// Get statistics
-$stats = [];
+// Demo statistics
+$stats = [
+    'users' => 8,
+    'clients' => 156,
+    'bills_month' => 45,
+    'revenue_month' => 12500.75
+];
 
-// Total users
-$result = $db->query("SELECT COUNT(*) as count FROM user WHERE status = 1");
-$stats['users'] = $result->fetch_assoc()['count'];
+// Demo chart data
+$chart_data = [
+    ['date' => '2025-09-01', 'count' => 12, 'revenue' => 1200],
+    ['date' => '2025-09-02', 'count' => 8, 'revenue' => 850],
+    ['date' => '2025-09-03', 'count' => 15, 'revenue' => 1450],
+    ['date' => '2025-09-04', 'count' => 20, 'revenue' => 2100],
+    ['date' => '2025-09-05', 'count' => 18, 'revenue' => 1800],
+    ['date' => '2025-09-06', 'count' => 22, 'revenue' => 2300],
+    ['date' => '2025-09-07', 'count' => 16, 'revenue' => 1650]
+];
 
-// Total clients
-$result = $db->query("SELECT COUNT(*) as count FROM owners WHERE status = 'active'");
-$stats['clients'] = $result->fetch_assoc()['count'];
-
-// Total bills this month
-$result = $db->query("SELECT COUNT(*) as count FROM bill WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())");
-$stats['bills_month'] = $result->fetch_assoc()['count'];
-
-// Total revenue this month
-$result = $db->query("SELECT COALESCE(SUM(price), 0) as total FROM bill WHERE MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())");
-$stats['revenue_month'] = $result->fetch_assoc()['total'];
-
-// Recent bills for chart
-$result = $db->query("
-    SELECT DATE(created_at) as date, COUNT(*) as count, SUM(price) as revenue 
-    FROM bill 
-    WHERE created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY) 
-    GROUP BY DATE(created_at) 
-    ORDER BY date DESC 
-    LIMIT 30
-");
-
-$chart_data = [];
-while ($row = $result->fetch_assoc()) {
-    $chart_data[] = $row;
-}
-
-// Recent activity
-$result = $db->query("
-    SELECT b.*, o.fname, o.lname 
-    FROM bill b 
-    JOIN owners o ON b.owners_id = o.id 
-    ORDER BY b.created_at DESC 
-    LIMIT 10
-");
-
-$recent_bills = [];
-while ($row = $result->fetch_assoc()) {
-    $recent_bills[] = $row;
-}
+// Demo recent bills
+$recent_bills = [
+    ['id' => 1, 'fname' => 'Juan', 'lname' => 'Pérez', 'price' => 45.50],
+    ['id' => 2, 'fname' => 'María', 'lname' => 'González', 'price' => 38.75],
+    ['id' => 3, 'fname' => 'Carlos', 'lname' => 'Rodríguez', 'price' => 52.20],
+    ['id' => 4, 'fname' => 'Ana', 'lname' => 'López', 'price' => 41.30],
+    ['id' => 5, 'fname' => 'Pedro', 'lname' => 'Martínez', 'price' => 47.85]
+];
 
 ob_start();
 ?>

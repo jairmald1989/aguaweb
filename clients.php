@@ -1,66 +1,10 @@
 <?php
 require_once 'app/config/config.php';
-require_once 'app/config/database.php';
-require_once 'app/models/Auth.php';
 
-$auth = new Auth();
-$auth->requireAuth();
-
-$db = Database::getInstance();
-$page_title = "Gestión de Clientes";
-
-// Handle form submissions
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action'])) {
-        switch ($_POST['action']) {
-            case 'add':
-                $fname = trim($_POST['fname']);
-                $lname = trim($_POST['lname']);
-                $mi = trim($_POST['mi']);
-                $address = trim($_POST['address']);
-                $contact = trim($_POST['contact']);
-                $category_id = (int)$_POST['category_id'];
-                $zone_id = !empty($_POST['zone_id']) ? (int)$_POST['zone_id'] : null;
-                $contract_number = trim($_POST['contract_number']);
-                
-                if (!empty($fname) && !empty($lname) && !empty($address)) {
-                    $sql = "INSERT INTO owners (fname, lname, mi, address, contact, category_id, zone_id, contract_number, status) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active')";
-                    
-                    try {
-                        $db->query($sql, [$fname, $lname, $mi, $address, $contact, $category_id, $zone_id, $contract_number]);
-                        $success_message = "Cliente agregado exitosamente.";
-                    } catch (Exception $e) {
-                        $error_message = "Error al agregar cliente: " . $e->getMessage();
-                    }
-                }
-                break;
-                
-            case 'edit':
-                $id = (int)$_POST['id'];
-                $fname = trim($_POST['fname']);
-                $lname = trim($_POST['lname']);
-                $mi = trim($_POST['mi']);
-                $address = trim($_POST['address']);
-                $contact = trim($_POST['contact']);
-                $category_id = (int)$_POST['category_id'];
-                $zone_id = !empty($_POST['zone_id']) ? (int)$_POST['zone_id'] : null;
-                $contract_number = trim($_POST['contract_number']);
-                $status = $_POST['status'];
-                
-                if ($id > 0 && !empty($fname) && !empty($lname)) {
-                    $sql = "UPDATE owners SET fname=?, lname=?, mi=?, address=?, contact=?, category_id=?, zone_id=?, contract_number=?, status=? WHERE id=?";
-                    
-                    try {
-                        $db->query($sql, [$fname, $lname, $mi, $address, $contact, $category_id, $zone_id, $contract_number, $status, $id]);
-                        $success_message = "Cliente actualizado exitosamente.";
-                    } catch (Exception $e) {
-                        $error_message = "Error al actualizar cliente: " . $e->getMessage();
-                    }
-                }
-                break;
-        }
-    }
+// Demo authentication check
+if (!isset($_SESSION['user_id'])) {
+    header('Location: index.php');
+    exit;
 }
 
 // Get search parameters
@@ -69,78 +13,81 @@ $category_filter = $_GET['category'] ?? '';
 $zone_filter = $_GET['zone'] ?? '';
 $status_filter = $_GET['status'] ?? '';
 
-// Build query
-$where_conditions = [];
-$params = [];
+// Demo data
+$categories = [
+    ['id' => 1, 'name' => 'Residencial'],
+    ['id' => 2, 'name' => 'Comercial'],
+    ['id' => 3, 'name' => 'Industrial']
+];
 
-if (!empty($search)) {
-    $where_conditions[] = "(CONCAT(fname, ' ', lname) LIKE ? OR address LIKE ? OR contact LIKE ? OR contract_number LIKE ?)";
-    $search_param = "%$search%";
-    $params = array_merge($params, [$search_param, $search_param, $search_param, $search_param]);
-}
+$zones = [
+    ['id' => 1, 'name' => 'Zona Norte'],
+    ['id' => 2, 'name' => 'Zona Sur'],
+    ['id' => 3, 'name' => 'Zona Centro']
+];
 
-if (!empty($category_filter)) {
-    $where_conditions[] = "o.category_id = ?";
-    $params[] = $category_filter;
-}
+$clients = [
+    [
+        'id' => 1,
+        'fname' => 'Juan Carlos',
+        'lname' => 'Pérez González',
+        'mi' => '12345678',
+        'address' => 'Av. Principal 123, Urb. Los Jardines',
+        'contact' => '987654321',
+        'category_id' => 1,
+        'category_name' => 'Residencial',
+        'zone_id' => 1,
+        'zone_name' => 'Zona Norte',
+        'contract_number' => 'CNT-001',
+        'status' => 'active'
+    ],
+    [
+        'id' => 2,
+        'fname' => 'María Elena',
+        'lname' => 'González López',
+        'mi' => '87654321',
+        'address' => 'Jr. Comercio 456, Centro Histórico',
+        'contact' => '912345678',
+        'category_id' => 2,
+        'category_name' => 'Comercial',
+        'zone_id' => 3,
+        'zone_name' => 'Zona Centro',
+        'contract_number' => 'CNT-002',
+        'status' => 'active'
+    ],
+    [
+        'id' => 3,
+        'fname' => 'Roberto',
+        'lname' => 'Martínez Silva',
+        'mi' => '11223344',
+        'address' => 'Av. Industrial 789, Parque Industrial',
+        'contact' => '998877665',
+        'category_id' => 3,
+        'category_name' => 'Industrial',
+        'zone_id' => 2,
+        'zone_name' => 'Zona Sur',
+        'contract_number' => 'CNT-003',
+        'status' => 'active'
+    ],
+    [
+        'id' => 4,
+        'fname' => 'Ana Sofía',
+        'lname' => 'Rodríguez Vargas',
+        'mi' => '55667788',
+        'address' => 'Calle Las Flores 321, Villa Hermosa',
+        'contact' => '944556677',
+        'category_id' => 1,
+        'category_name' => 'Residencial',
+        'zone_id' => 1,
+        'zone_name' => 'Zona Norte',
+        'contract_number' => 'CNT-004',
+        'status' => 'suspended'
+    ]
+];
 
-if (!empty($zone_filter)) {
-    $where_conditions[] = "o.zone_id = ?";
-    $params[] = $zone_filter;
-}
-
-if (!empty($status_filter)) {
-    $where_conditions[] = "o.status = ?";
-    $params[] = $status_filter;
-} else {
-    $where_conditions[] = "o.status != 'deleted'";
-}
-
-$where_clause = !empty($where_conditions) ? "WHERE " . implode(" AND ", $where_conditions) : "";
-
-// Get clients with pagination
-$page = max(1, (int)($_GET['page'] ?? 1));
-$per_page = 20;
-$offset = ($page - 1) * $per_page;
-
-$sql = "SELECT o.*, c.name as category_name, z.name as zone_name 
-        FROM owners o 
-        LEFT JOIN categories c ON o.category_id = c.id 
-        LEFT JOIN zones z ON o.zone_id = z.id 
-        $where_clause 
-        ORDER BY o.fname, o.lname 
-        LIMIT $per_page OFFSET $offset";
-
-$clients = [];
-$result = $db->query($sql, $params);
-if ($result) {
-    while ($row = $result->fetch_assoc()) {
-        $clients[] = $row;
-    }
-}
-
-// Get total count for pagination
-$count_sql = "SELECT COUNT(*) as total FROM owners o $where_clause";
-$count_result = $db->query($count_sql, $params);
-$total_clients = $count_result->fetch_assoc()['total'];
-$total_pages = ceil($total_clients / $per_page);
-
-// Get categories and zones for dropdowns
-$categories = [];
-$result = $db->query("SELECT * FROM categories WHERE status = 1 ORDER BY name");
-if ($result) {
-    while ($row = $result->fetch_assoc()) {
-        $categories[] = $row;
-    }
-}
-
-$zones = [];
-$result = $db->query("SELECT * FROM zones WHERE status = 1 ORDER BY name");
-if ($result) {
-    while ($row = $result->fetch_assoc()) {
-        $zones[] = $row;
-    }
-}
+$total_clients = count($clients);
+$total_pages = 1;
+$page = 1;
 
 ob_start();
 ?>

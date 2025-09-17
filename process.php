@@ -1,6 +1,5 @@
 <?php
 require_once 'app/config/config.php';
-require_once 'app/models/Auth.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
@@ -11,10 +10,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
     
-    $auth = new Auth();
-    
-    if ($auth->login($username, $password)) {
-        // Successful login
+    // Demo authentication - accept admin/admin
+    if ($username === 'admin' && $password === 'admin') {
+        // Successful login - set demo session
+        $_SESSION['user_id'] = 1;
+        $_SESSION['username'] = 'admin';
+        $_SESSION['name'] = 'Administrador Demo';
+        $_SESSION['role'] = ROLE_ADMIN;
+        $_SESSION['permissions'] = ['all'];
+        $_SESSION['login_time'] = time();
+        
         header('Location: dashboard.php');
         exit;
     } else {
