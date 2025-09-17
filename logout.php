@@ -1,9 +1,7 @@
 <?php
- session_start();
-unset($_SESSION['id']);
- header('Location:index.php');
+require_once 'app/config/config.php';
+require_once 'app/models/Auth.php';
 
-unset($_SESSION['admin']);
- header('Location:index.php');
- 
+$auth = new Auth();
+$auth->logout();
 ?>

@@ -1,0 +1,81 @@
+# Security for water billing system
+
+# Protect sensitive files
+<Files "*.sql">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "config.php">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "database.php">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Protect uploads directory from executing PHP
+<Directory "public/uploads/">
+    php_flag engine off
+    RemoveHandler .php .phtml .php3
+    RemoveType .php .phtml .php3
+    
+    # Only allow images
+    <FilesMatch "\.(jpg|jpeg|png|gif)$">
+        Order allow,deny
+        Allow from all
+    </FilesMatch>
+    
+    <FilesMatch "^.*\.(php|phtml|php3|inc)$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</Directory>
+
+# Enable rewrite engine
+RewriteEngine On
+
+# Redirect HTTP to HTTPS (uncomment in production)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Remove trailing slashes
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([^/]+)/$ $1 [R=301,L]
+
+# Security headers
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options DENY
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Disable server signature
+ServerSignature Off
+
+# Hide PHP version
+<IfModule mod_php7.c>
+    php_value expose_php 0
+</IfModule>
+
+# File upload size limits
+<IfModule mod_php7.c>
+    php_value upload_max_filesize 5M
+    php_value post_max_size 5M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+</IfModule>
+
+# Prevent access to git files
+<DirectoryMatch "\.git">
+    Order allow,deny
+    Deny from all
+</DirectoryMatch>
+
+# Prevent access to sensitive directories
+RedirectMatch 404 /\..*$
+RedirectMatch 404 /app/.*$
+RedirectMatch 404 /_notes/.*$

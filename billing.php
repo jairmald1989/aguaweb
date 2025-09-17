@@ -1,10 +1,13 @@
-<?php session_start();
-if(!isset($_SESSION['id'])){
-	echo '<script>windows: location="index.php"</script>';
+<?php
+// Legacy redirect to new dashboard
+require_once 'app/config/config.php';
+require_once 'app/models/Auth.php';
 
-	
-	}
-		
+$auth = new Auth();
+$auth->requireAuth();
+
+header('Location: dashboard.php');
+exit;
 ?>
 <?php
 $session=$_SESSION['id'];
